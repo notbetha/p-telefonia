@@ -1,0 +1,67 @@
+/* Fondo general con la imagen */
+body {
+  font-family: Arial, sans-serif;
+  background-image: url('img/background-imagen.jpg');
+  background-size: cover;
+  background-position: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos para el header */
+header {
+  background-color: #8a76f1; /* Celeste claro */
+  padding: 20px;
+  text-align: left;
+}
+
+header .logo {
+  height: 50px; /* Ajusta el tamaño de la imagen del logo */
+}
+
+/* Estilos para el contenedor del login */
+.login-container {
+  background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco semi-transparente */
+  width: 300px;
+  margin: 100px auto;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.login-container label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #5c9ded; /* Azul claro */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-container button:hover {
+  background-color: #4a8bca; /* Azul más oscuro al pasar el cursor */
+}
+
+#error-message {
+  color: red;
+  text-align: center;
+}

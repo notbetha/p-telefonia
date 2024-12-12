@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llamadas</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Importa el CSS aquí -->
+  </head>
+<body>
+    <h1>Últimas Llamadas</h1>
+    <table id="calls-table">
+        <thead>
+            <tr>
+                <th>Inicio</th>
+                <th>Número Llamado</th>
+                <th>Duración</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Las llamadas se llenarán aquí -->
+        </tbody>
+    </table>
+
+    <script>
+        // Obtener el id_client de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const id_client = urlParams.get('id_client');
+
+        async function getCalls(id_client) {
+            const response = await fetch(`/api/calls/${id_client}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                const callsTable = document.getElementById('calls-table').getElementsByTagName('tbody')[0];
+                callsTable.innerHTML = '';  // Limpiar las llamadas anteriores
+                data.forEach(call => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${call.call_start}</td><td>${call.called_number}</td><td>${call.effective_duration}</td>`;
+                    callsTable.appendChild(row);
+                });
+            } else {
+                alert('No se encontraron llamadas: ' + data.message);
+            }
+        }
+
+        if (id_client) {
+            getCalls(id_client);  // Si id_client está presente, obtén las llamadas
+        } else {
+            alert('No se ha proporcionado un id_client.');
+        }
+    </script>
+</body>
+</html>
