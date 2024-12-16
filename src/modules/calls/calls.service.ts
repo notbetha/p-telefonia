@@ -1,9 +1,8 @@
-// src/modules/calls/calls.service.ts
 import { pool } from '../database/database';
 
 export class CallsService {
   static async getCallsByClientId(clientId: string, page: number): Promise<any> {
-    const itemsPerPage = 30;
+    const itemsPerPage = 5000;  // Modificar a 5000 registros por página
     const offset = (page - 1) * itemsPerPage;
 
     try {

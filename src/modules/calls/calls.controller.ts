@@ -4,7 +4,7 @@ import { pool } from '../config/db';
 export const getCalls = async (req: Request, res: Response) => {
     const idClient = req.params.idClient;  // Obtener el idClient de la ruta
     const page = parseInt(req.query.page as string) || 1;  // Página actual (por defecto 1)
-    const itemsPerPage = 30;  // Cantidad de registros por página
+    const itemsPerPage = 5000;  // Modificar a 5000 registros por página
     const offset = (page - 1) * itemsPerPage;  // Desplazamiento para la paginación
 
     // Consulta para obtener las llamadas
