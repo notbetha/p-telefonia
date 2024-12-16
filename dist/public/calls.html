@@ -3,20 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Llamadas</title>
+    <title>Llamadas del Cliente</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Historial de Llamadas</h1>
-
-    <!-- Mensaje de error que aparecerá si no se encuentran llamadas -->
-    <div id="error-message" style="display: none; color: red;"></div>
-
-    <!-- Contenedor donde se mostrarán las llamadas -->
-    <div id="calls-container">
-        <!-- Aquí se agregarán las llamadas dinámicamente -->
+    <div class="container">
+        <h1>Llamadas Realizadas</h1>
+        <table id="callsTable">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Número Llamado</th>
+                    <th>Duración (segundos)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Las filas de la tabla se llenarán dinámicamente con JavaScript -->
+            </tbody>
+        </table>
+        <div id="pagination">
+            <button id="prevPage">Anterior</button>
+            <button id="nextPage">Siguiente</button>
+        </div>
+        <div id="error-message" style="display:none; color:red;"></div> <!-- Contenedor para mostrar errores -->
     </div>
-
     <script src="calls.js"></script>
 </body>
 </html>

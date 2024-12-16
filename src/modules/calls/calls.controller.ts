@@ -1,34 +1,48 @@
-// src/modules/calls/calls.controller.ts
 import { Request, Response } from 'express';
-import { pool } from '../database/database';
+import { pool } from '../config/db';
 
-// Aquí actualizamos la función para que reciba solo el id_client como argumento
-export const getCalls = async (id_client: string): Promise<any> => {
-  console.log('ID del cliente recibido:', id_client);
+export const getCalls = async (req: Request, res: Response) => {
+    const idClient = req.params.idClient;  // Obtener el idClient de la ruta
+    const page = parseInt(req.query.page as string) || 1;  // Página actual (por defecto 1)
+    const itemsPerPage = 30;  // Cantidad de registros por página
+    const offset = (page - 1) * itemsPerPage;  // Desplazamiento para la paginación
 
-  try {
-    // Ejecutamos la consulta para obtener las llamadas
-    const [rows]: any = await pool.execute(
-      'SELECT id_client, call_start, called_number, effective_duration FROM calls WHERE id_client = ? ORDER BY call_start DESC LIMIT 100',
-      [id_client]
-    );
+    // Consulta para obtener las llamadas
+    const query = `
+        SELECT call_start, called_number, effective_duration
+        FROM calls
+        WHERE id_client = ?
+        ORDER BY call_start DESC
+        LIMIT ? OFFSET ?;
+    `;
 
-    console.log('Resultado de las llamadas:', rows);
+    // Consulta para contar el total de registros (para paginación)
+    const countQuery = `
+        SELECT COUNT(*) AS totalCalls
+        FROM calls
+        WHERE id_client = ?;
+    `;
 
-    if (rows.length === 0) {
-      // Si no se encuentran llamadas, se devuelve un mensaje adecuado
-      throw new Error('No se encontraron llamadas para este cliente');
+    try {
+        // Obtener las llamadas
+        const [calls] = await pool.query(query, [idClient, itemsPerPage, offset]) as any[];
+
+        // Contar el total de llamadas
+        const [countResult] = await pool.query(countQuery, [idClient]) as any[];
+        const totalCalls = countResult[0].totalCalls;
+
+        // Calcular las páginas
+        const totalPages = Math.ceil(totalCalls / itemsPerPage);
+
+        // Responder con las llamadas, página actual, total de páginas y total de llamadas
+        res.json({
+            calls: calls,  // Asegurarte de que la propiedad 'calls' está disponible
+            currentPage: page,
+            totalPages: totalPages,
+            totalCalls: totalCalls
+        });
+    } catch (error) {
+        console.error('Error al obtener las llamadas:', error);
+        res.status(500).json({ error: 'Error al obtener las llamadas' });
     }
-
-    return rows;  // Retornamos las llamadas
-  } catch (error: unknown) {
-    console.error('Error al obtener las llamadas:', error);
-
-    // Comprobamos si el error es una instancia de Error
-    if (error instanceof Error) {
-      throw new Error(error.message);  // Lanzamos el error para que sea manejado en la ruta
-    } else {
-      throw new Error('Un error desconocido ocurrió');
-    }
-  }
 };

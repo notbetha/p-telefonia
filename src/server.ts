@@ -1,13 +1,21 @@
 import express from 'express';
-import bodyParser from 'body-parser';
-import loginRouter from './modules/auth/auth.routes';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import callsRoutes from './modules/calls/calls.routes';  // Asegúrate de que esta importación sea correcta
+
+dotenv.config();
 
 const app = express();
-app.use(bodyParser.json());
+const port = process.env.PORT || 3000;
 
-// Usa el router para el login
-app.use('/login', loginRouter);
+// Middlewares
+app.use(cors());
+app.use(express.json());
 
-app.listen(3000, () => {
-  console.log('Servidor corriendo en http://localhost:3000');
+// Rutas
+app.use('/api/calls', callsRoutes);  // Asegúrate de que la ruta esté configurada correctamente
+
+// Inicia el servidor
+app.listen(port, () => {
+    console.log(`Servidor corriendo en http://localhost:${port}`);
 });

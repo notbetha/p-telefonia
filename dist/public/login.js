@@ -28,12 +28,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const data = await response.json();
                 console.log('Respuesta recibida:', data);
 
-                // Guardar el id_client en localStorage para usarlo en otra página
-                localStorage.setItem('id_client', data.id_client);
-
-                // Redirigir al usuario a calls.html
-                window.location.href = 'calls.html';  // Cambia la URL según sea necesario
-
+                // Verifica que id_client se recibe correctamente
+                if (data && data.id_client) {
+                    localStorage.setItem('idClient', data.id_client);  // Guardamos idClient en localStorage
+                    window.location.href = 'calls.html';  // Redirige a calls.html
+                } else {
+                    errorMessage.style.display = 'block';
+                    errorMessage.textContent = 'No se pudo obtener el ID del cliente.';
+                }
             } catch (error) {
                 console.error('Error en la autenticación:', error);
                 errorMessage.style.display = 'block';  // Muestra el mensaje de error

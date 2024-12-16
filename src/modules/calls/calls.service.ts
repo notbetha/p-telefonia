@@ -2,19 +2,34 @@
 import { pool } from '../database/database';
 
 export class CallsService {
-  static async getCallsByClientId(clientId: string): Promise<any> {
+  static async getCallsByClientId(clientId: string, page: number): Promise<any> {
+    const itemsPerPage = 30;
+    const offset = (page - 1) * itemsPerPage;
+
     try {
-      // Consulta para obtener las últimas 100 llamadas por id_client
-      const [rows]: any = await pool.execute(
-        `SELECT id_client, call_start, called_number, effective_duration
+      const [calls]: any = await pool.execute(
+        `SELECT call_start, called_number, effective_duration
          FROM calls
          WHERE id_client = ?
          ORDER BY call_start DESC
-         LIMIT 100`,
+         LIMIT ? OFFSET ?`,
+        [clientId, itemsPerPage, offset]
+      );
+
+      const [countResult]: any = await pool.execute(
+        `SELECT COUNT(*) AS totalCalls FROM calls WHERE id_client = ?`,
         [clientId]
       );
-      return rows;  // Devuelvo el array de resultados
-    } catch (error: any) {
+
+      const totalCalls = countResult[0].totalCalls;
+      const totalPages = Math.ceil(totalCalls / itemsPerPage);
+
+      return {
+        calls,
+        totalCalls,
+        totalPages,
+      };
+    } catch (error) {
       console.error(error);
       throw new Error('Error al obtener las llamadas');
     }
