@@ -14,11 +14,10 @@ class AuthService {
 
       return rows[0];  // Retorna el primer resultado de la consulta
     } catch (error: any) {
-      console.error(error);
+      console.error('Error al validar usuario:', error);
       throw new Error('Error al validar usuario');
     }
   }
 }
 
-// Exportación por defecto
 export default AuthService;

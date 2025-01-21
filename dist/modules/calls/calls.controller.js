@@ -1,30 +1,67 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function(resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); }
-        }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); }
-        }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCalls = void 0;
-const database_1 = require("../database/database");
-const getCalls = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id_client } = req.params;
-    try {
-        // Consulta para obtener las llamadas del cliente (ahora con 5000 registros)
-        const [rows] = yield database_1.pool.execute('SELECT id_client, call_start, called_number, effective_duration FROM calls WHERE id_client = ? ORDER BY call_start DESC LIMIT 5000', [id_client]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron llamadas para este cliente' });
-        }
-        return res.status(200).json(rows);
-    } catch (error) {
-        console.error('Error al obtener llamadas:', error);
-        return res.status(500).json({ message: 'Error desconocido', error: error.message || error });
+const connection = require('../config/db');
+
+const getCalls = async (req, res) => {
+    const { idClient } = req.params;
+    const { startDate, endDate } = req.query;
+    const page = parseInt(req.query.page || '1', 10);
+    const itemsPerPage = 10;
+    const offset = (page - 1) * itemsPerPage;
+
+    if (!idClient) {
+        return res.status(400).json({ error: 'El ID del cliente es obligatorio' });
     }
-});
-exports.getCalls = getCalls;
+
+    let query = `
+        SELECT call_start, called_number, effective_duration
+        FROM calls
+        WHERE id_client = ?`;
+
+    let queryParams = [idClient];
+
+    if (startDate && endDate) {
+        query += ` AND call_start BETWEEN ? AND ?`;
+        queryParams.push(`${startDate} 00:00:00`, `${endDate} 23:59:59`);
+    }
+
+    query += ` ORDER BY call_start DESC LIMIT ? OFFSET ?;`;
+    queryParams.push(itemsPerPage, offset);
+
+    const countQuery = `
+        SELECT COUNT(*) AS totalCalls
+        FROM calls
+        WHERE id_client = ?
+        ${startDate && endDate ? 'AND call_start BETWEEN ? AND ?' : ''};
+    `;
+
+    try {
+        connection.query(query, queryParams, (err, calls) => {
+            if (err) {
+                console.error('Error al ejecutar la consulta:', err.message);
+                return res.status(500).json({ error: 'Error interno del servidor' });
+            }
+
+            connection.query(countQuery, queryParams.slice(0, 3), (err, countResult) => {
+                if (err) {
+                    console.error('Error al contar las llamadas:', err.message);
+                    return res.status(500).json({ error: 'Error interno del servidor' });
+                }
+
+                const totalCalls = countResult[0].totalCalls;
+                const totalPages = Math.ceil(totalCalls / itemsPerPage);
+
+                res.json({
+                    calls,
+                    currentPage: page,
+                    itemsPerPage,
+                    totalPages,
+                    totalCalls,
+                });
+            });
+        });
+    } catch (error) {
+        console.error('Error inesperado:', error.message);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
+
+module.exports = { getCalls };

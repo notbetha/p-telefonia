@@ -1,34 +1,29 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function(resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); }
-        }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); }
-        }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsService = void 0;
 const database_1 = require("../database/database");
 class CallsService {
-    static getCallsByClientId(clientId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                // Consulta para obtener las llamadas del cliente (con 5000 registros)
-                const [rows] = yield database_1.pool.execute(`SELECT id_client, call_start, called_number, effective_duration
+    static async getCallsByClientId(clientId, page) {
+        const itemsPerPage = 5000;
+        const offset = (page - 1) * itemsPerPage;
+        try {
+            const [calls] = await database_1.pool.execute(`SELECT call_start, called_number, effective_duration
          FROM calls
          WHERE id_client = ?
          ORDER BY call_start DESC
-         LIMIT 5000`, [clientId]);
-                return rows; // Devuelvo el array de resultados
-            } catch (error) {
-                console.error(error);
-                throw new Error('Error al obtener las llamadas');
-            }
-        });
+         LIMIT ? OFFSET ?`, [clientId, itemsPerPage, offset]);
+            const [countResult] = await database_1.pool.execute(`SELECT COUNT(*) AS totalCalls FROM calls WHERE id_client = ?`, [clientId]);
+            const totalCalls = countResult[0].totalCalls;
+            const totalPages = Math.ceil(totalCalls / itemsPerPage);
+            return {
+                calls,
+                totalCalls,
+                totalPages,
+            };
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error al obtener las llamadas');
+        }
     }
 }
 exports.CallsService = CallsService;

@@ -34,11 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.location.href = 'calls.html';  // Redirige a calls.html
                 } else {
                     errorMessage.style.display = 'block';
-                    errorMessage.textContent = 'No se pudo obtener el ID del cliente.';
+                    errorMessage.textContent = 'No se pudo obtener el ID del cliente. Verifica tus credenciales.';
                 }
             } catch (error) {
                 console.error('Error en la autenticación:', error);
                 errorMessage.style.display = 'block';  // Muestra el mensaje de error
+                errorMessage.textContent = 'Hubo un error en el proceso de autenticación. Intenta de nuevo más tarde.';
             }
         });
     }
