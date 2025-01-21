@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,25 +7,30 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Llamadas Realizadas</h1>
-        <table id="callsTable">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Número Llamado</th>
-                    <th>Duración (segundos)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Las filas de la tabla se llenarán dinámicamente con JavaScript -->
-            </tbody>
-        </table>
-        <div id="pagination">
-            <button id="prevPage">Anterior</button>
-            <button id="nextPage">Siguiente</button>
-        </div>
-        <div id="error-message" style="display:none; color:red;"></div> <!-- Contenedor para mostrar errores -->
+    <h1>Llamadas del Cliente</h1>
+
+    <div>
+        <label for="startDate">Fecha inicio:</label>
+        <input type="date" id="startDate">
+        <label for="endDate">Fecha fin:</label>
+        <input type="date" id="endDate">
+        <button id="filterButton">Filtrar</button>
+    </div>
+
+    <div id="paginationInfo">Cargando...</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Número</th>
+                <th>Duración</th>
+            </tr>
+        </thead>
+        <tbody id="callsTableBody"></tbody>
+    </table>
+    <div>
+        <button id="prevPage">Anterior</button>
+        <button id="nextPage">Siguiente</button>
     </div>
     <script src="calls.js"></script>
 </body>

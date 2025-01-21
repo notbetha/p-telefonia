@@ -1,15 +1,20 @@
 import { Request, Response } from 'express';
 
-// Simulación de una función de autenticación (esto debe ir acorde a tu lógica real)
-export const loginController = async (login: string, password: string): Promise<any> => {
-  // Ejemplo de una consulta a la base de datos o validación
-  if (login === 'test' && password === 'password') {
-    return {
-      id_client: 1,
-      login,
-      password,
-      // Otros campos que desees devolver
-    };
-  }
-  return null;  // Si las credenciales son incorrectas, devuelve null
+// Simulación de la función de autenticación (ajustado a tu ejemplo)
+export const loginController = (login: string, password: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    // Aquí va tu lógica para validar las credenciales
+    if (login === 'test' && password === 'password') {
+      // Si las credenciales son correctas, se retorna el objeto del usuario
+      resolve({
+        id_client: 1,
+        login,
+        password,
+        // Otros campos que desees retornar
+      });
+    } else {
+      // Si las credenciales no son correctas, se rechaza la promesa
+      reject(new Error('Credenciales incorrectas'));
+    }
+  });
 };
